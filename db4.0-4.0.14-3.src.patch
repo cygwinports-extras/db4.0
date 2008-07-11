@@ -1,0 +1,138 @@
+diff -urN -x CYGWIN-PATCHES -x 'aclocal.m4~' -x aclocal.m4t -x autom4te.cache -x config.cache -x config.log -x config.status -x config.h -x '*config.h.in' -x ABOUT-NLS -x Makefile.in.in -x Makevars.template -x '*SlackBuild*' -x '*.egg-info' -x '*.class' -x '*.pyc' -x '*.mo' -x '*.gmo' -x '*.orig' -x '*.rej' -x '*.spec' -x '*.temp' -x '*~' -x '*.stackdump' -x COPYING -x INSTALL -x compile -x config-ml.in -x config.guess -x config.sub -x depcomp -x elisp-comp -x install-sh -x libtool.m4 -x ltoptions.m4 -x ltsugar.m4 -x ltversion.m4 -x 'lt~obsolete.m4' -x ltmain.sh -x mdate-sh -x missing -x mkinstalldirs -x py-compile -x symlink-tree -x texinfo.tex -x ylwrap -x config.rpath -x omf.make -x xmldocs.make -x gnome-doc-utils.make -x gnome-doc-utils.m4 -x intltool.m4 -x intltool-extract -x intltool-extract.in -x intltool-merge -x intltool-merge.in -x intltool-update -x intltool-update.in -x aclocal.m4 -x configure -x config.hin -x db.jar -x libtool.ac -x 'lt*.ac' origsrc/db-4.0.14/dist/Makefile.in src/db-4.0.14/dist/Makefile.in
+--- origsrc/db-4.0.14/dist/Makefile.in	2001-11-09 16:48:45.000000000 -0600
++++ src/db-4.0.14/dist/Makefile.in	2008-07-11 11:47:09.578125000 -0500
+@@ -121,6 +121,7 @@
+ # Tcl support is optional and requires shared libraries.
+ ##################################################
+ TCFLAGS=	@TCFLAGS@
++TSOLINK=		@MAKEFILE_TSOLINK@
+ LIBTSO_LIBS=	@LIBTSO_LIBS@
+ libtso_base=	libdb_tcl
+ libtso=		$(libtso_base)-$(SOVERSION).@SOSUFFIX@
+@@ -297,7 +298,7 @@
+ 	    -o $@ $(JAVA_OBJS) $(C_OBJS) $(LIBJSO_LIBS)
+ 
+ $(libtso_target): $(TCL_OBJS) $(C_OBJS)
+-	$(SOLINK) $(SOFLAGS) $(LDFLAGS) \
++	$(TSOLINK) $(SOFLAGS) $(LDFLAGS) \
+ 	    -o $@ $(TCL_OBJS) $(C_OBJS) $(LIBTSO_LIBS)
+ 
+ $(libxso_target): $(CXX_OBJS) $(C_OBJS)
+diff -urN -x CYGWIN-PATCHES -x 'aclocal.m4~' -x aclocal.m4t -x autom4te.cache -x config.cache -x config.log -x config.status -x config.h -x '*config.h.in' -x ABOUT-NLS -x Makefile.in.in -x Makevars.template -x '*SlackBuild*' -x '*.egg-info' -x '*.class' -x '*.pyc' -x '*.mo' -x '*.gmo' -x '*.orig' -x '*.rej' -x '*.spec' -x '*.temp' -x '*~' -x '*.stackdump' -x COPYING -x INSTALL -x compile -x config-ml.in -x config.guess -x config.sub -x depcomp -x elisp-comp -x install-sh -x libtool.m4 -x ltoptions.m4 -x ltsugar.m4 -x ltversion.m4 -x 'lt~obsolete.m4' -x ltmain.sh -x mdate-sh -x missing -x mkinstalldirs -x py-compile -x symlink-tree -x texinfo.tex -x ylwrap -x config.rpath -x omf.make -x xmldocs.make -x gnome-doc-utils.make -x gnome-doc-utils.m4 -x intltool.m4 -x intltool-extract -x intltool-extract.in -x intltool-merge -x intltool-merge.in -x intltool-update -x intltool-update.in -x aclocal.m4 -x configure -x config.hin -x db.jar -x libtool.ac -x 'lt*.ac' origsrc/db-4.0.14/dist/aclocal/tcl.ac src/db-4.0.14/dist/aclocal/tcl.ac
+--- origsrc/db-4.0.14/dist/aclocal/tcl.ac	2001-11-11 12:01:34.000000000 -0600
++++ src/db-4.0.14/dist/aclocal/tcl.ac	2008-07-11 11:47:09.593750000 -0500
+@@ -50,7 +50,7 @@
+ 
+ 	    # First check to see if --with-tclconfig was specified.
+ 	    if test "${with_tclconfig}" != no; then
+-		if test -f "${with_tclconfig}/tclConfig.sh" ; then
++		if test -e "${with_tclconfig}/tclConfig.sh" ; then
+ 		    ac_cv_c_tclconfig=`(cd ${with_tclconfig}; pwd)`
+ 		else
+ 		    AC_MSG_ERROR([${with_tclconfig} directory doesn't contain tclConfig.sh])
+@@ -59,8 +59,8 @@
+ 
+ 	    # check in a few common install locations
+ 	    if test x"${ac_cv_c_tclconfig}" = x ; then
+-		for i in `ls -d /usr/local/lib 2>/dev/null` ; do
+-		    if test -f "$i/tclConfig.sh" ; then
++		for i in `ls -d /usr/lib /usr/local/lib 2>/dev/null` ; do
++		    if test -e "$i/tclConfig.sh" ; then
+ 			ac_cv_c_tclconfig=`(cd $i; pwd)`
+ 			break
+ 		    fi
+@@ -80,7 +80,7 @@
+ AC_DEFUN(SC_LOAD_TCLCONFIG, [
+ 	AC_MSG_CHECKING([for existence of $TCL_BIN_DIR/tclConfig.sh])
+ 
+-	if test -f "$TCL_BIN_DIR/tclConfig.sh" ; then
++	if test -e "$TCL_BIN_DIR/tclConfig.sh" ; then
+ 		AC_MSG_RESULT([loading])
+ 		. $TCL_BIN_DIR/tclConfig.sh
+ 	else
+@@ -101,7 +101,7 @@
+ 	# load time. [#4843]
+ 	#
+ 	case "$host_os" in
+-	aix*)
++	aix*|cygwin*)
+ 		LIBTSO_LIBS="$LIBTSO_LIBS $TCL_LIB_SPEC $TCL_LIB_FLAG";;
+ 	esac
+ 
+@@ -125,7 +125,7 @@
+ 	SC_PATH_TCLCONFIG
+ 	SC_LOAD_TCLCONFIG
+ 
+-	if test x"$TCL_PREFIX" != x && test -f "$TCL_PREFIX/include/tcl.h"; then
++	if test x"$TCL_PREFIX" != x && test -e "$TCL_PREFIX/include/tcl.h"; then
+ 		TCFLAGS="-I$TCL_PREFIX/include"
+ 	fi
+ 
+diff -urN -x CYGWIN-PATCHES -x 'aclocal.m4~' -x aclocal.m4t -x autom4te.cache -x config.cache -x config.log -x config.status -x config.h -x '*config.h.in' -x ABOUT-NLS -x Makefile.in.in -x Makevars.template -x '*SlackBuild*' -x '*.egg-info' -x '*.class' -x '*.pyc' -x '*.mo' -x '*.gmo' -x '*.orig' -x '*.rej' -x '*.spec' -x '*.temp' -x '*~' -x '*.stackdump' -x COPYING -x INSTALL -x compile -x config-ml.in -x config.guess -x config.sub -x depcomp -x elisp-comp -x install-sh -x libtool.m4 -x ltoptions.m4 -x ltsugar.m4 -x ltversion.m4 -x 'lt~obsolete.m4' -x ltmain.sh -x mdate-sh -x missing -x mkinstalldirs -x py-compile -x symlink-tree -x texinfo.tex -x ylwrap -x config.rpath -x omf.make -x xmldocs.make -x gnome-doc-utils.make -x gnome-doc-utils.m4 -x intltool.m4 -x intltool-extract -x intltool-extract.in -x intltool-merge -x intltool-merge.in -x intltool-update -x intltool-update.in -x aclocal.m4 -x configure -x config.hin -x db.jar -x libtool.ac -x 'lt*.ac' origsrc/db-4.0.14/dist/aclocal_java/ac_jni_include_dirs.ac src/db-4.0.14/dist/aclocal_java/ac_jni_include_dirs.ac
+--- origsrc/db-4.0.14/dist/aclocal_java/ac_jni_include_dirs.ac	2001-09-19 08:58:33.000000000 -0500
++++ src/db-4.0.14/dist/aclocal_java/ac_jni_include_dirs.ac	2008-07-11 13:34:43.203125000 -0500
+@@ -35,7 +35,7 @@
+ JNI_INCLUDE_DIRS=""
+ 
+ test "x$JAVAC" = x && AC_MSG_ERROR(['$JAVAC' undefined])
+-AC_PATH_PROG(_ACJNI_JAVAC, $JAVAC, no)
++AC_PATH_PROG(_ACJNI_JAVAC, $JAVAC, $JAVAC)
+ test "x$_ACJNI_JAVAC" = xno && AC_MSG_ERROR([$JAVAC could not be found in path])
+ 
+ _ACJNI_FOLLOW_SYMLINKS("$_ACJNI_JAVAC")
+diff -urN -x CYGWIN-PATCHES -x 'aclocal.m4~' -x aclocal.m4t -x autom4te.cache -x config.cache -x config.log -x config.status -x config.h -x '*config.h.in' -x ABOUT-NLS -x Makefile.in.in -x Makevars.template -x '*SlackBuild*' -x '*.egg-info' -x '*.class' -x '*.pyc' -x '*.mo' -x '*.gmo' -x '*.orig' -x '*.rej' -x '*.spec' -x '*.temp' -x '*~' -x '*.stackdump' -x COPYING -x INSTALL -x compile -x config-ml.in -x config.guess -x config.sub -x depcomp -x elisp-comp -x install-sh -x libtool.m4 -x ltoptions.m4 -x ltsugar.m4 -x ltversion.m4 -x 'lt~obsolete.m4' -x ltmain.sh -x mdate-sh -x missing -x mkinstalldirs -x py-compile -x symlink-tree -x texinfo.tex -x ylwrap -x config.rpath -x omf.make -x xmldocs.make -x gnome-doc-utils.make -x gnome-doc-utils.m4 -x intltool.m4 -x intltool-extract -x intltool-extract.in -x intltool-merge -x intltool-merge.in -x intltool-update -x intltool-update.in -x aclocal.m4 -x configure -x config.hin -x db.jar -x libtool.ac -x 'lt*.ac' origsrc/db-4.0.14/dist/configure.ac src/db-4.0.14/dist/configure.ac
+--- origsrc/db-4.0.14/dist/configure.ac	2001-11-16 10:15:01.000000000 -0600
++++ src/db-4.0.14/dist/configure.ac	2008-07-11 13:35:17.156250000 -0500
+@@ -53,6 +53,7 @@
+ AC_SUBST(MAKEFILE_CXXLINK)
+ AC_SUBST(MAKEFILE_SOLINK)
+ AC_SUBST(MAKEFILE_XSOLINK)
++AC_SUBST(MAKEFILE_TSOLINK)
+ AC_SUBST(POSTLINK)
+ AC_SUBST(RPC_CLIENT_OBJS)
+ AC_SUBST(RPM_POST_INSTALL)
+@@ -263,8 +264,8 @@
+ versuffix=""
+ release=""
+ libname=libfoo
+-eval library_names=\"$library_names_spec\"
+-SOSUFFIX=`echo "$library_names" | sed -e 's/.*\.\([[a-zA-Z0-9_]]*\).*/\1/'`
++eval library_names=\"$shrext_cmds\"
++SOSUFFIX=`echo "$library_names"`
+ AC_MSG_RESULT($SOSUFFIX)
+ 
+ if test "$SOSUFFIX" = '' ; then
+@@ -279,11 +280,19 @@
+ 
+ MAKEFILE_CC="\$(LIBTOOL) --mode=compile ${MAKEFILE_CC}"
+ MAKEFILE_SOLINK="\$(LIBTOOL) --mode=link ${MAKEFILE_CCLINK} -avoid-version"
++MAKEFILE_TSOLINK="\$(LIBTOOL) --mode=link ${MAKEFILE_CCLINK} -module -avoid-version"
+ MAKEFILE_CCLINK="\$(LIBTOOL) --mode=link ${MAKEFILE_CCLINK}"
+ MAKEFILE_CXX="\$(LIBTOOL) --mode=compile ${MAKEFILE_CXX}"
+ MAKEFILE_XSOLINK="\$(LIBTOOL) --mode=link ${MAKEFILE_CXXLINK} -avoid-version"
+ MAKEFILE_CXXLINK="\$(LIBTOOL) --mode=link ${MAKEFILE_CXXLINK}"
+ 
++case "$host_os" in
++	cygwin*)
++		MAKEFILE_SOLINK="$MAKEFILE_SOLINK -no-undefined"
++		MAKEFILE_XSOLINK="$MAKEFILE_XSOLINK -no-undefined"
++		MAKEFILE_TSOLINK="$MAKEFILE_TSOLINK -no-undefined"
++esac
++
+ # Configure for shared libraries, static libraries, or both.  If both are
+ # configured, build the utilities and example programs with shared versions.
+ #
+diff -urN -x CYGWIN-PATCHES -x 'aclocal.m4~' -x aclocal.m4t -x autom4te.cache -x config.cache -x config.log -x config.status -x config.h -x '*config.h.in' -x ABOUT-NLS -x Makefile.in.in -x Makevars.template -x '*SlackBuild*' -x '*.egg-info' -x '*.class' -x '*.pyc' -x '*.mo' -x '*.gmo' -x '*.orig' -x '*.rej' -x '*.spec' -x '*.temp' -x '*~' -x '*.stackdump' -x COPYING -x INSTALL -x compile -x config-ml.in -x config.guess -x config.sub -x depcomp -x elisp-comp -x install-sh -x libtool.m4 -x ltoptions.m4 -x ltsugar.m4 -x ltversion.m4 -x 'lt~obsolete.m4' -x ltmain.sh -x mdate-sh -x missing -x mkinstalldirs -x py-compile -x symlink-tree -x texinfo.tex -x ylwrap -x config.rpath -x omf.make -x xmldocs.make -x gnome-doc-utils.make -x gnome-doc-utils.m4 -x intltool.m4 -x intltool-extract -x intltool-extract.in -x intltool-merge -x intltool-merge.in -x intltool-update -x intltool-update.in -x aclocal.m4 -x configure -x config.hin -x db.jar -x libtool.ac -x 'lt*.ac' origsrc/db-4.0.14/lock/lock_region.c src/db-4.0.14/lock/lock_region.c
+--- origsrc/db-4.0.14/lock/lock_region.c	2001-11-05 09:24:05.000000000 -0600
++++ src/db-4.0.14/lock/lock_region.c	2008-07-11 11:47:09.625000000 -0500
+@@ -21,6 +21,10 @@
+ #include "db_shash.h"
+ #include "lock.h"
+ 
++#ifdef __lock_init
++#undef __lock_init
++#endif
++
+ static int  __lock_init __P((DB_ENV *, DB_LOCKTAB *));
+ static size_t
+ 	    __lock_region_size __P((DB_ENV *));
