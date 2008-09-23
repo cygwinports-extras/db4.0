@@ -19,35 +19,6 @@
  $(libxso_target): $(CXX_OBJS) $(C_OBJS)
 --- origsrc/db-4.0.14/dist/aclocal/tcl.ac	2001-11-11 12:01:34.000000000 -0600
 +++ src/db-4.0.14/dist/aclocal/tcl.ac	2008-07-11 11:47:09.593750000 -0500
-@@ -50,7 +50,7 @@
- 
- 	    # First check to see if --with-tclconfig was specified.
- 	    if test "${with_tclconfig}" != no; then
--		if test -f "${with_tclconfig}/tclConfig.sh" ; then
-+		if test -e "${with_tclconfig}/tclConfig.sh" ; then
- 		    ac_cv_c_tclconfig=`(cd ${with_tclconfig}; pwd)`
- 		else
- 		    AC_MSG_ERROR([${with_tclconfig} directory doesn't contain tclConfig.sh])
-@@ -59,8 +59,8 @@
- 
- 	    # check in a few common install locations
- 	    if test x"${ac_cv_c_tclconfig}" = x ; then
--		for i in `ls -d /usr/local/lib 2>/dev/null` ; do
--		    if test -f "$i/tclConfig.sh" ; then
-+		for i in `ls -d /usr/lib /usr/local/lib 2>/dev/null` ; do
-+		    if test -e "$i/tclConfig.sh" ; then
- 			ac_cv_c_tclconfig=`(cd $i; pwd)`
- 			break
- 		    fi
-@@ -80,7 +80,7 @@
- AC_DEFUN(SC_LOAD_TCLCONFIG, [
- 	AC_MSG_CHECKING([for existence of $TCL_BIN_DIR/tclConfig.sh])
- 
--	if test -f "$TCL_BIN_DIR/tclConfig.sh" ; then
-+	if test -e "$TCL_BIN_DIR/tclConfig.sh" ; then
- 		AC_MSG_RESULT([loading])
- 		. $TCL_BIN_DIR/tclConfig.sh
- 	else
 @@ -101,7 +101,7 @@
  	# load time. [#4843]
  	#
@@ -56,15 +27,6 @@
 +	aix*|cygwin*)
  		LIBTSO_LIBS="$LIBTSO_LIBS $TCL_LIB_SPEC $TCL_LIB_FLAG";;
  	esac
- 
-@@ -125,7 +125,7 @@
- 	SC_PATH_TCLCONFIG
- 	SC_LOAD_TCLCONFIG
- 
--	if test x"$TCL_PREFIX" != x && test -f "$TCL_PREFIX/include/tcl.h"; then
-+	if test x"$TCL_PREFIX" != x && test -e "$TCL_PREFIX/include/tcl.h"; then
- 		TCFLAGS="-I$TCL_PREFIX/include"
- 	fi
  
 --- origsrc/db-4.0.14/dist/aclocal_java/ac_jni_include_dirs.ac	2001-09-19 08:58:33.000000000 -0500
 +++ src/db-4.0.14/dist/aclocal_java/ac_jni_include_dirs.ac	2008-07-11 13:34:43.203125000 -0500

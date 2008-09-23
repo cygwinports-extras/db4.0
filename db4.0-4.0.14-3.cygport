@@ -1,1 +1,1 @@
-inherit berkdb
+inherit java tcl berkdb
